@@ -1,0 +1,5 @@
+package com.travelapp.helper.enums;
+
+public enum PaymentStatus {
+    PENDING, AUTHORIZED, CAPTURED, FAILED, CANCELLED, REFUNDED, PARTIALLY_REFUNDED, PAID, PARTIALLY_PAID, PROCESSING, COMPLETED
+}

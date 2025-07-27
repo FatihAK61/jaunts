@@ -1,0 +1,6 @@
+package com.travelapp.helper.enums;
+
+public enum TicketCategory {
+    BOOKING_ISSUE, PAYMENT_PROBLEM, CANCELLATION, REFUND, TECHNICAL_SUPPORT,
+    GENERAL_INQUIRY, COMPLAINT, SUGGESTION
+}
