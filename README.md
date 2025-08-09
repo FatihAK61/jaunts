@@ -80,7 +80,7 @@ docker-compose --version
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/jaunts.git
+git clone https://github.com/FatihAK61/jaunts.git
 cd jaunts
 ```
 
@@ -102,10 +102,10 @@ mvn spring-boot:run
 **Option B: Using JAR**
 
 ```bash
-java -jar target/travel-app-backend-1.0.0.jar
+java -jar target/jaunts-1.0.0.jar
 ```
 
-🎉 **The application will be available at:** `http://localhost:8080`
+🎉 **The application will be available at:** `http://localhost:1461`
 
 ## 🐳 Docker Setup
 
@@ -129,14 +129,14 @@ docker-compose down
 docker build -t jaunts:latest .
 
 # Run the container
-docker run -p 8080:8080 jaunts:latest
+docker run -p 1461:6161 jaunts:latest
 ```
 
 ### Docker Services
 
 | Service        | Port | Description         |
 |----------------|------|---------------------|
-| **jaunts-app** | 8080 | Main application    |
+| **jaunts-app** | 1461 | Main application    |
 | **postgres**   | 5432 | PostgreSQL database |
 
 ## 🗄️ Database Configuration
@@ -161,61 +161,6 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 When using Docker Compose, the database configuration is handled automatically through environment variables defined in
 `docker-compose.yml`.
-
-## 📚 API Documentation
-
-Once the application is running, you can access:
-
-- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
-- **API Docs**: `http://localhost:8080/v3/api-docs`
-
-### Sample Endpoints
-
-```http
-GET    /api/v1/hotels           # Search hotels
-POST   /api/v1/bookings        # Create booking
-GET    /api/v1/bookings/{id}   # Get booking details
-PUT    /api/v1/bookings/{id}   # Update booking
-DELETE /api/v1/bookings/{id}   # Cancel booking
-GET    /api/v1/users/{id}/itineraries  # Get user itineraries
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-mvn test
-
-# Run specific test class
-mvn test -Dtest=BookingServiceTest
-
-# Generate test coverage report
-mvn jacoco:report
-```
-
-## 📁 Project Structure
-
-```
-jaunts/
-├── 📁 src/
-│   ├── 📁 main/
-│   │   ├── 📁 java/com/jaunts/
-│   │   │   ├── 📁 controller/     # REST Controllers
-│   │   │   ├── 📁 service/        # Business Logic
-│   │   │   ├── 📁 repository/     # Data Access Layer
-│   │   │   ├── 📁 model/          # Entity Models
-│   │   │   ├── 📁 dto/            # Data Transfer Objects
-│   │   │   ├── 📁 config/         # Configuration Classes
-│   │   │   └── 📁 exception/      # Exception Handlers
-│   │   └── 📁 resources/
-│   │       ├── application.properties
-│   │       └── 📁 db/migration/   # Database migrations
-│   └── 📁 test/                   # Test files
-├── 📄 Dockerfile
-├── 📄 docker-compose.yml
-├── 📄 pom.xml
-└── 📄 README.md
-```
 
 ## 🤝 Contributing
 
@@ -246,9 +191,8 @@ MIT License - feel free to use this project for personal and commercial purposes
 
 Got questions or suggestions? We'd love to hear from you!
 
-- 📧 **Email**: [your-email@example.com](mailto:your-email@example.com)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/your-username/jaunts/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-username/jaunts/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/FatihAK61/jaunts/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/FatihAK61/jaunts/discussions)
 
 ---
 
