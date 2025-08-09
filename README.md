@@ -12,31 +12,14 @@
 
 ## 📋 Table of Contents
 
-- [✨ Features](#-features)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [📋 Prerequisites](#-prerequisites)
 - [🚀 Quick Start](#-quick-start)
 - [🐳 Docker Setup](#-docker-setup)
 - [🗄️ Database Configuration](#️-database-configuration)
-- [📚 API Documentation](#-api-documentation)
-- [🧪 Testing](#-testing)
-- [📁 Project Structure](#-project-structure)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 - [📞 Contact](#-contact)
-
-## ✨ Features
-
-🔹 **RESTful API Architecture** - Clean, well-documented endpoints for all travel operations  
-🔹 **Hotel & Accommodation Search** - Advanced filtering and booking capabilities  
-🔹 **User Management** - Complete authentication and authorization system  
-🔹 **Reservation System** - Handle bookings, cancellations, and modifications  
-🔹 **Itinerary Planning** - Create, manage, and share travel plans  
-🔹 **Database Integration** - Robust PostgreSQL integration with JPA/Hibernate  
-🔹 **Error Handling** - Comprehensive error handling with meaningful responses  
-🔹 **Logging & Monitoring** - Built-in logging for debugging and monitoring  
-🔹 **Docker Ready** - Containerized deployment with Docker Compose support  
-🔹 **Scalable Architecture** - Designed for horizontal scaling and microservices
 
 ## 🛠️ Tech Stack
 
