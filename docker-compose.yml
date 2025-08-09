@@ -11,7 +11,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5433:5432"  # Local PostgreSQL 5432'de çalışıyor, bu yüzden 5433 kullanıyoruz
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -35,7 +35,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=123456789
     ports:
-      - "1461:6161"  # Spring Boot default 8080, external olarak 8081 kullanıyoruz
+      - "1461:6161"
     networks:
       - app-network
     restart: unless-stopped
