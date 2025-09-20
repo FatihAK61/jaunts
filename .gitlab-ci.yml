@@ -4,19 +4,19 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
   JAR_NAME: "app.jar"
   APP_NAME: "myapp"
   APP_PORT: "8080"
 
-# Build stage - Runner'da Docker ile build
+# Build stage - Runner'da Docker ile build etme
 build_jar:
   stage: build
   image: docker:28.4.0
   services:
     - docker:28.4.0-dind
   variables:
-    DOCKER_HOST: tcp://docker:2376
+    DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_TLS_CERTDIR: ""
   before_script:
     - docker info
   script:
