@@ -1,0 +1,10 @@
+FROM eclipse-temurin:23-jdk-alpine
+
+WORKDIR /app
+
+# Maven için
+COPY pom.xml .
+COPY src ./src
+
+RUN apt-get update && apt-get install -y maven
+RUN mvn clean package -DskipTests

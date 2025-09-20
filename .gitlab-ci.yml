@@ -1,0 +1,93 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  JAR_NAME: "app.jar"
+  APP_NAME: "myapp"
+  APP_PORT: "8080"
+
+# Build stage - Runner'da Docker ile build
+build_jar:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "/certs/client"
+  before_script:
+    - docker info
+  script:
+    - echo "Building JAR file with Docker..."
+    # Build image oluştur
+    - docker build -f Dockerfile.build -t build-image .
+    # Container oluştur ve JAR'ı çıkart
+    - docker create --name temp-build-container build-image
+    - docker cp temp-build-container:/app/target/$JAR_NAME ./$JAR_NAME
+    - docker rm temp-build-container
+    - docker rmi build-image
+    - ls -la $JAR_NAME
+  artifacts:
+    paths:
+      - $JAR_NAME
+    expire_in: 1 hour
+  only:
+    - main
+    - develop
+  tags:
+    - ubuntu
+    - docker
+
+# Deploy stage - Sunucuda Docker ile deploy
+deploy_docker:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying application with Docker..."
+    # JAR dosyasını sunucuya kopyala
+    - rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/myapp/
+    # Docker Compose dosyalarını kopyala
+    - rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/myapp/
+    - rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/myapp/
+    - rsync -avz nginx.conf gitlab-runner@$SERVER_HOST:/opt/myapp/nginx/ || true
+    # Eski container'ları durdur ve kaldır
+    - ssh gitlab-runner@$SERVER_HOST "cd /opt/myapp && docker-compose down || true"
+    # Yeni container'ları başlat
+    - ssh gitlab-runner@$SERVER_HOST "cd /opt/myapp && docker-compose up --build -d"
+    # Container durumunu kontrol et
+    - ssh gitlab-runner@$SERVER_HOST "cd /opt/myapp && docker-compose ps"
+  dependencies:
+    - build_jar
+  only:
+    - main
+  tags:
+    - ubuntu
+
+# Health check
+health_check:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Performing health check..."
+    - sleep 30
+    - curl -f http://$SERVER_HOST:$APP_PORT/actuator/health || curl -f http://$SERVER_HOST:$APP_PORT/ || curl -f http://$SERVER_HOST:$APP_PORT/api/health
+    - echo "Application is healthy!"
+  dependencies:
+    - deploy_docker
+  only:
+    - main
+  tags:
+    - ubuntu
