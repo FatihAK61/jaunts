@@ -8,7 +8,7 @@ variables:
   APP_NAME: "myapp"
   APP_PORT: "8080"
 
-# Build stage - Runner'da Docker ile build
+# Build stage - Runner'da Docker ile build etme
 build_jar:
   stage: build
   image: docker:28.4.0
