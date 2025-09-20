@@ -133,7 +133,6 @@ Update `src/main/resources/application.properties`:
 spring.datasource.url=jdbc:postgresql://localhost:5432/traveldb
 spring.datasource.username=yourusername
 spring.datasource.password=yourpassword
-
 # JPA/Hibernate Configuration
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
@@ -183,7 +182,7 @@ Got questions or suggestions? We'd love to hear from you!
 
 **⭐ If you find this project helpful, please give it a star! ⭐**
 
-Made with ❤️ by Fatih AK
+Made with ❤️ by Fatih AK in Ankara, Turkey
 
 [⬆ Back to Top](#-jaunts---travel-application-backend)
 
