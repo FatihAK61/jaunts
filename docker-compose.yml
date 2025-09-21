@@ -6,7 +6,7 @@ services:
     container_name: jaunts-container
     restart: unless-stopped
     ports:
-      - "1461:8080"
+      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=production
       - TZ=Europe/Istanbul
