@@ -10,7 +10,10 @@ variables:
 # Local'de JAR build et
 build_jar:
   stage: build
-  image: maven:3.9.9-openjdk-23
+  image: maven:3.9.9-eclipse-temurin-21
+  before_script:
+    - java -version  # Log JDK version
+    - mvn --version  # Log Maven version
   script:
     - echo "Building JAR file locally..."
     - mvn clean package -DskipTests
@@ -43,7 +46,7 @@ deploy_docker:
     # Dosyaları sunucuya kopyala
     - rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
-    - rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - rsync -avz Dockerfile gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - rsync -avz nginx/nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
     # Deploy et
     - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"

@@ -1,39 +1,21 @@
-# Build stage
-FROM openjdk:23-jre-slim AS build
+FROM maven:3.9.9-eclipse-temurin-21
 
 WORKDIR /app
 
-# Copy Maven/Gradle files
-COPY pom.xml .
-# Eğer Maven wrapper kullanıyorsanız:
-COPY .mvn .mvn
-COPY mvnw .
+# JAR dosyasını kopyala (CI/CD'den gelecek)
+COPY jaunts-1.0.0.jar /app/app.jar
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
+# Curl ekle (healthcheck için)
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Copy source code
-COPY src ./src
-
-# Build application
-RUN ./mvnw clean package -DskipTests
-
-# Runtime stage
-FROM eclipse-temurin:23-jre-alpine
-
-WORKDIR /app
-
-# Copy jar file from build stage
-COPY --from=build /app/target/*.jar app.jar
-
-# Create non-root user
-RUN addgroup --system spring && adduser --system spring --ingroup spring
-USER spring:spring
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:1461/actuator/health || exit 1
+# Non-root user oluştur
+RUN useradd -r -s /bin/false appuser
+RUN chown appuser:appuser /app/app.jar
+USER appuser
 
 EXPOSE 1461
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+CMD ["java", "-Xmx512m", "-Xms256m", "-jar", "/app/app.jar"]
