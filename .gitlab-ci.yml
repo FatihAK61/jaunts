@@ -26,7 +26,6 @@ build_jar:
     - ubuntu
     - docker
 
-# Deploy stage - Sunucuda Docker ile deploy
 # Sunucuda Docker ile deploy
 deploy_docker:
   stage: deploy
@@ -43,7 +42,8 @@ deploy_docker:
     # Dosyaları sunucuya kopyala
     - rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
-    - rsync -avz Dockerfile gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - rsync -avz nginx/nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
     # Deploy et
     - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
     - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up --build -d"
