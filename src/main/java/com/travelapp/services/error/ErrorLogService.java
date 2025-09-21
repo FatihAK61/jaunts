@@ -30,23 +30,24 @@ public class ErrorLogService {
 
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void logError(String traceId, String errorCode, String errorMessage, String requestPath, Integer httpStatus, Exception exception, HttpServletRequest request) {
+    public void logError(String traceId, String errorCode, String errorMessage, String requestPath, Integer httpStatus, Exception exception, String httpMethod,
+                         String clientIp, String userAgent, String requestHeaders, String requestParameters, String sessionId, String userId) {
         try {
             ErrorLog errorLog = ErrorLog.builder()
                     .traceId(traceId)
                     .errorCode(errorCode)
                     .errorMessage(errorMessage)
                     .requestPath(requestPath)
-                    .httpMethod(request != null ? request.getMethod() : null)
+                    .httpMethod(httpMethod)
                     .httpStatus(httpStatus)
-                    .clientIp(getClientIpAddress(request))
-                    .userAgent(request != null ? request.getHeader("User-Agent") : null)
+                    .clientIp(clientIp)
+                    .userAgent(userAgent)
                     .exceptionClass(exception != null ? exception.getClass().getSimpleName() : null)
                     .stackTrace(getStackTrace(exception))
-                    .requestHeaders(getRequestHeaders(request))
-                    .requestParameters(getRequestParameters(request))
-                    .sessionId(getSessionId(request))
-                    .userId(getUserId(request))
+                    .requestHeaders(requestHeaders)
+                    .requestParameters(requestParameters)
+                    .sessionId(sessionId)
+                    .userId(userId)
                     .severity(determineSeverity(httpStatus, exception))
                     .resolved(false)
                     .build();
