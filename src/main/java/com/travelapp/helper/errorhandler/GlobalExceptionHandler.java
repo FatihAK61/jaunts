@@ -372,6 +372,28 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateOperationException(IllegalStateException ex, HttpServletRequest request) {
+        String traceId = generateTraceId();
+
+        log.warn("Invalid operation: {}", ex.getLocalizedMessage());
+
+        String errorMessage = "Geçersiz işlem hatası.";
+
+        errorLogService.logError(traceId, "INVALID_OPERATION_ERROR", errorMessage, request.getRequestURI(), HttpStatus.BAD_REQUEST.value(), ex, request);
+
+        ErrorResponse error = ErrorResponse.of(
+                "INVALID_OPERATION_ERROR",
+                errorMessage,
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST.value(),
+                traceId
+        );
+        return ResponseEntity.badRequest()
+                .header(TRACE_ID_HEADER, traceId)
+                .body(error);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request) {
         String traceId = generateTraceId();
