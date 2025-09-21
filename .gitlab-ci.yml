@@ -6,7 +6,6 @@ variables:
   JAR_NAME: "jaunts-1.0.0.jar"
   APP_NAME: "jaunts"
   SERVER_HOST: "192.168.64.2"
-  SSH_PASSWORD: "365278941"
 
 # Local'de JAR build et
 build_jar:
