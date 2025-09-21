@@ -23,8 +23,9 @@ build_jar:
   only:
     - main
   tags:
-    - ubuntu
+    - jaunts
     - docker
+    - ubuntu
 
 # Sunucuda Docker ile deploy
 deploy_docker:
@@ -53,4 +54,6 @@ deploy_docker:
   only:
     - main
   tags:
+    - jaunts
+    - docker
     - ubuntu
