@@ -10,7 +10,7 @@ variables:
 
 build_jar:
   stage: build
-  image: maven:3.9.9-eclipse-temurin-21
+  image: maven:3.9.9-eclipse-temurin-21-alpine
   before_script:
     - java -version
     - mvn --version
