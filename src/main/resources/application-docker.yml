@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/jauntsmain
+    url: jdbc:postgresql://192.168.64.2:5432/jauntsmain
     username: postgres
-    password: 123456789
+    password: 365278941
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -29,7 +29,7 @@ management:
       show-details: always
 
 server:
-  port: 6161
+  port: 1461
 
 logging:
   level:
