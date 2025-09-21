@@ -30,6 +30,7 @@ services:
     depends_on:
       jaunts:
         condition: service_healthy
+    command: sh -c "sleep 15 && nginx -g 'daemon off;'"
     networks:
       - app-network
 
