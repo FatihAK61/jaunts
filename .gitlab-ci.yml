@@ -10,7 +10,7 @@ variables:
 # Local'de JAR build et
 build_jar:
   stage: build
-  image: maven:3.8.5-openjdk-17
+  image: maven:3.9.9-openjdk-23
   script:
     - echo "Building JAR file locally..."
     - mvn clean package -DskipTests

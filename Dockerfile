@@ -1,5 +1,5 @@
 # Build stage
-FROM eclipse-temurin:23-jdk-alpine AS build
+FROM openjdk:23-jre-slim AS build
 
 WORKDIR /app
 
