@@ -4,8 +4,8 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  JAR_NAME: "app.jar"
-  APP_NAME: "myapp"
+  JAR_NAME: "jaunts-1.0.0.jar"
+  APP_NAME: "jaunts"
   APP_PORT: "8080"
 
 # Build stage - Runner'da Docker ile build
