@@ -7,7 +7,6 @@ variables:
   APP_NAME: "jaunts"
   SERVER_HOST: "192.168.64.2"
 
-# Local'de JAR build et
 build_jar:
   stage: build
   image: maven:3.9.9-eclipse-temurin-21
@@ -30,7 +29,6 @@ build_jar:
     - docker
     - ubuntu
 
-# Sunucuda Docker ile deploy
 deploy_docker:
   stage: deploy
   image: alpine:latest
