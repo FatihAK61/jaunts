@@ -6,6 +6,7 @@ variables:
   JAR_NAME: "jaunts-1.0.0.jar"
   APP_NAME: "jaunts"
   SERVER_HOST: "192.168.64.2"
+  SSH_PASSWORD: "365278941"
 
 # Local'de JAR build et
 build_jar:
@@ -36,20 +37,18 @@ deploy_docker:
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client rsync sshpass
-      - mkdir -p ~/.ssh
-      - chmod 700 ~/.ssh
-      - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
     - echo "Deploying to server with Docker..."
-    # Dosyaları sunucuya kopyala
-    - rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
-    - rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
-    - rsync -avz Dockerfile gitlab-runner@$SERVER_HOST:/opt/jaunts/
-    - rsync -avz nginx/nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
-    # Deploy et
-    - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
-    - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up --build -d"
-    - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose ps"
+    - sshpass -p "$SSH_PASSWORD" rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - sshpass -p "$SSH_PASSWORD" rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - sshpass -p "$SSH_PASSWORD" rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - sshpass -p "$SSH_PASSWORD" rsync -avz nginx/nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up --build -d"
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose ps"
   dependencies:
     - build_jar
   only:
