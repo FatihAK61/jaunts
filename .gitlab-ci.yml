@@ -43,27 +43,20 @@ build_jar:
 deploy_docker:
   stage: deploy
   image: alpine:latest
-  before_script:
-    - apk add --no-cache openssh-client rsync
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
     - echo "Deploying application with Docker..."
     # JAR dosyasını sunucuya kopyala
-    - rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/myapp/
+    - rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
     # Docker Compose dosyalarını kopyala
-    - rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/myapp/
-    - rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/myapp/
-    - rsync -avz nginx.conf gitlab-runner@$SERVER_HOST:/opt/myapp/nginx/ || true
+    - rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - rsync -avz nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
     # Eski container'ları durdur ve kaldır
-    - ssh gitlab-runner@$SERVER_HOST "cd /opt/myapp && docker-compose down || true"
+    - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
     # Yeni container'ları başlat
-    - ssh gitlab-runner@$SERVER_HOST "cd /opt/myapp && docker-compose up --build -d"
+    - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up --build -d"
     # Container durumunu kontrol et
-    - ssh gitlab-runner@$SERVER_HOST "cd /opt/myapp && docker-compose ps"
+    - ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose ps"
   dependencies:
     - build_jar
   only:
