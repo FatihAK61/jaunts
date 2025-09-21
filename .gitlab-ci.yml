@@ -6,7 +6,7 @@ variables:
   JAR_NAME: "jaunts-1.0.0.jar"
   APP_NAME: "jaunts"
   SERVER_HOST: "192.168.64.2"
-  DOCKER_BUILDKIT: "1"  # BuildKit aktif et
+  DOCKER_BUILDKIT: "1"
 
 build_jar:
   stage: build
@@ -16,14 +16,14 @@ build_jar:
     - mvn --version
   script:
     - echo "Building JAR file locally..."
-    - mvn clean package -DskipTests -T 1C  # Paralel build
+    - mvn clean package -DskipTests -T 1C
     - cp target/$JAR_NAME ./$JAR_NAME
     - ls -la $JAR_NAME
   artifacts:
     paths:
       - $JAR_NAME
     expire_in: 1 hour
-  cache: # Maven cache ekleyelim
+  cache:
     paths:
       - .m2/repository
   only:
