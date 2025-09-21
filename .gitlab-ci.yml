@@ -40,6 +40,7 @@ deploy_docker:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "sudo apt update && sudo apt install docker-compose-plugin -y"
   script:
     - echo "Deploying to server with Docker..."
     - sshpass -p "$SSH_PASSWORD" rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
