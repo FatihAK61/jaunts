@@ -6,7 +6,7 @@ variables:
   JAR_NAME: "jaunts-1.0.0.jar"
   APP_NAME: "jaunts"
   SERVER_HOST: "192.168.64.2"
-  DOCKER_BUILDKIT: "1"
+  DOCKER_BUILDKIT: "1"  # BuildKit aktif et
 
 build_jar:
   stage: build
@@ -42,7 +42,7 @@ deploy_docker:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying with rolling deployment strategy..."
+    - echo "Deploying to server with optimized Docker..."
 
     # Dosyaları transfer et
     - sshpass -p "$SSH_PASSWORD" rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
@@ -50,37 +50,21 @@ deploy_docker:
     - sshpass -p "$SSH_PASSWORD" rsync -avz Dockerfile gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - sshpass -p "$SSH_PASSWORD" rsync -avz nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
 
+    # Mevcut container'ları durdur
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
+
     # Yeni image'ı build et
     - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && DOCKER_BUILDKIT=1 docker-compose build jaunts"
 
-    # Nginx'i önce başlat (eğer çalışmıyorsa)
-    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up -d nginx || true"
-
-    # Eski jaunts container'ını durdur
-    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose stop jaunts || true"
-
-    # Yeni jaunts container'ını başlat
+    # Container'ları başlat (nginx önce, ardından jaunts)
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up -d nginx"
     - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up -d jaunts"
 
-    # Health check - 60 saniye bekle
-    - echo "Waiting for application to be healthy..."
-    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "
-      cd /opt/jaunts &&
-      for i in \$(seq 1 12); do
-      if docker-compose exec -T jaunts curl -f http://localhost:8080/actuator/health >/dev/null 2>&1; then
-      echo 'Application is healthy!';
-      break;
-      fi;
-      echo \"Health check attempt \$i/12 failed, waiting 5 seconds...\";
-      sleep 5;
-      done
-      "
-
-    # Container durumlarını göster
+    # Health check
     - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose ps"
 
     # Eski unused image'ları temizle
-    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "docker image prune -f || true"
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "docker system prune -f --volumes=false || true"
 
   dependencies:
     - build_jar
