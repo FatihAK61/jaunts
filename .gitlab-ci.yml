@@ -44,7 +44,7 @@ deploy_docker:
     - echo "Deploying to server with Docker..."
     - sshpass -p "$SSH_PASSWORD" rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - sshpass -p "$SSH_PASSWORD" rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
-    - sshpass -p "$SSH_PASSWORD" rsync -avz Dockerfile.production gitlab-runner@$SERVER_HOST:/opt/jaunts/
+    - sshpass -p "$SSH_PASSWORD" rsync -avz Dockerfile gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - sshpass -p "$SSH_PASSWORD" rsync -avz nginx/nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
     - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
     - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up --build -d"
