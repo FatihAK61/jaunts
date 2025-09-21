@@ -1,13 +1,12 @@
-FROM eclipse-temurin:23-jdk-alpine
+FROM openjdk:23-jre-slim
 
 WORKDIR /app
 
-# JAR dosyasını kopyala
-COPY app.jar /app/app.jar
+# JAR dosyasını kopyala (CI/CD'den gelecek)
+COPY jaunts-1.0.0.jar /app/app.jar
 
-# Timezone ayarı
-RUN apt-get update && apt-get install -y tzdata
-ENV TZ=Europe/Istanbul
+# Curl ekle (healthcheck için)
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Non-root user oluştur
 RUN useradd -r -s /bin/false appuser
