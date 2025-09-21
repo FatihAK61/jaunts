@@ -13,8 +13,8 @@ build_jar:
   stage: build
   image: maven:3.9.9-eclipse-temurin-21
   before_script:
-    - java -version  # Log JDK version
-    - mvn --version  # Log Maven version
+    - java -version
+    - mvn --version
   script:
     - echo "Building JAR file locally..."
     - mvn clean package -DskipTests
