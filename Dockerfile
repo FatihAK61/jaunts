@@ -1,22 +1,28 @@
-FROM maven:3.9.9-eclipse-temurin-21
+# Multi-stage build ile optimize edilmiş Dockerfile
+FROM eclipse-temurin:21-jre-alpine AS runtime
+
+# Curl ekle (daha küçük alpine paketi)
+RUN apk add --no-cache curl
+
+# Non-root user oluştur
+RUN addgroup -g 1001 -S appuser && adduser -u 1001 -S appuser -G appuser
 
 WORKDIR /app
 
-# JAR dosyasını kopyala (CI/CD'den gelecek)
-COPY jaunts-1.0.0.jar /app/app.jar
+# JAR dosyasını kopyala
+COPY jaunts-1.0.0.jar app.jar
 
-# Curl ekle (healthcheck için)
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Ownership ayarla
+RUN chown appuser:appuser app.jar
 
-# Non-root user oluştur
-RUN useradd -r -s /bin/false appuser
-RUN chown appuser:appuser /app/app.jar
 USER appuser
 
-# Uygulamanın çalıştığı portu expose et
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+# JVM optimizasyonları
+ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -XX:+UseStringDeduplication"
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=2 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-CMD ["java", "-Xmx512m", "-Xms256m", "-jar", "/app/app.jar"]
+CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

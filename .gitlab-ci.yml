@@ -6,6 +6,7 @@ variables:
   JAR_NAME: "jaunts-1.0.0.jar"
   APP_NAME: "jaunts"
   SERVER_HOST: "192.168.64.2"
+  DOCKER_BUILDKIT: "1"
 
 build_jar:
   stage: build
@@ -15,13 +16,16 @@ build_jar:
     - mvn --version
   script:
     - echo "Building JAR file locally..."
-    - mvn clean package -DskipTests
+    - mvn clean package -DskipTests -T 1C  # Paralel build
     - cp target/$JAR_NAME ./$JAR_NAME
     - ls -la $JAR_NAME
   artifacts:
     paths:
       - $JAR_NAME
     expire_in: 1 hour
+  cache: # Maven cache ekleyelim
+    paths:
+      - .m2/repository
   only:
     - main
   tags:
@@ -33,19 +37,35 @@ deploy_docker:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh-client rsync sshpass
+    - apk add --no-cache openssh-client rsync sshpass docker
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying to server with Docker..."
+    - echo "Deploying to server with optimized Docker..."
+
+    # Dosyaları transfer et
     - sshpass -p "$SSH_PASSWORD" rsync -avz $JAR_NAME gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - sshpass -p "$SSH_PASSWORD" rsync -avz docker-compose.yml gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - sshpass -p "$SSH_PASSWORD" rsync -avz Dockerfile gitlab-runner@$SERVER_HOST:/opt/jaunts/
     - sshpass -p "$SSH_PASSWORD" rsync -avz nginx.conf gitlab-runner@$SERVER_HOST:/opt/jaunts/nginx/ || true
-    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose down || true"
-    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up --build -d"
+
+    # Eski container'ı durdur ama image'ı sakla
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose stop jaunts || true"
+
+    # Yeni image'ı build et (paralel)
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && DOCKER_BUILDKIT=1 docker-compose build --parallel jaunts"
+
+    # Container'ları başlat
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up -d --no-recreate nginx"
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose up -d jaunts"
+
+    # Health check
     - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "cd /opt/jaunts && docker-compose ps"
+
+    # Eski unused image'ları temizle
+    - sshpass -p "$SSH_PASSWORD" ssh gitlab-runner@$SERVER_HOST "docker system prune -f --volumes=false || true"
+
   dependencies:
     - build_jar
   only:
