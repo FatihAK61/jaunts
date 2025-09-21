@@ -35,12 +35,10 @@ deploy_docker:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh-client rsync
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - apk add --no-cache openssh-client rsync sshpass
+      - mkdir -p ~/.ssh
+      - chmod 700 ~/.ssh
+      - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
     - echo "Deploying to server with Docker..."
     # Dosyaları sunucuya kopyala
