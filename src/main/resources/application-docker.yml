@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://192.168.64.2:5432/jauntsmain
+    url: jdbc:postgresql://192.168.64.2:6432/jauntsmain
     username: postgres
     password: 365278941
     driver-class-name: org.postgresql.Driver
