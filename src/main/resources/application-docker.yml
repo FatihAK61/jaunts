@@ -18,7 +18,6 @@ spring:
     init:
       mode: always
 
-# Actuator endpoints for health check
 management:
   endpoints:
     web:
