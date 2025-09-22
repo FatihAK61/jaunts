@@ -38,40 +38,6 @@ services:
     networks:
       - app-network
 
-  postgres:
-    image: postgres:latest
-    container_name: postgres-container
-    networks:
-      - app-network
-    environment:
-      - POSTGRES_DB=jauntsmain
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=365278941
-    volumes:
-      - ./postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
-    expose:
-      - "5432"
-
-  pgbouncer:
-    image: bitnami/pgbouncer:latest
-    container_name: pgbouncer
-    networks:
-      - app-network
-    ports:
-      - "6432:6432"
-    environment:
-      - POSTGRESQL_HOST=postgres-container
-      - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USERNAME=postgres
-      - POSTGRESQL_PASSWORD=365278941
-      - POSTGRESQL_DATABASE=jauntsmain
-      - PGBOUNCER_DATABASE=jauntsmain
-      - PGBOUNCER_POOL_MODE=transaction
-      - PGBOUNCER_MAX_CLIENT_CONN=100
-      - PGBOUNCER_DEFAULT_POOL_SIZE=20
-
 networks:
   app-network:
     driver: bridge
